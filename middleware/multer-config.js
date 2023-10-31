@@ -3,12 +3,14 @@ const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
 
+// Types MIME pour les images
 const MIME_TYPES = {
       "image/jpg": "jpg",
       "image/jpeg": "jpg",
       "image/png": "png",
 };
 
+// Configuration du stockage des fichiers
 const storage = multer.diskStorage({
       destination: (req, file, callback) => {
             callback(null, "images");
@@ -20,9 +22,10 @@ const storage = multer.diskStorage({
       },
 });
 
+// Middleware de téléchargement de fichiers
 const upload = multer({ storage: storage }).single("image");
 
-// REDIMENTIONNER L'IMAGE
+// Middleware pour redimensionner les images
 const imageOptimization = (req, res, next) => {
       console.log("Middleware imageResizer started");
       if (!req.file) {

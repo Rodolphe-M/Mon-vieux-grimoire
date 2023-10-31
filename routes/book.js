@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
+// Middleware d'authentification
 const auth = require("../middleware/auth");
-
+// Middleware pour le traitement des fichiers
 const { upload, imageOptimization } = require("../middleware/multer-config");
 
+// Contrôleur pour les livres, gestion des opérations CRUD ( Create, Read, Update, Delete)
 const bookCtrl = require("../controllers/book");
 
 router.get("/", bookCtrl.getAllBooks);

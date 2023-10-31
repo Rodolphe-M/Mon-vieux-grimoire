@@ -1,23 +1,24 @@
 const Book = require("../models/Book");
 const fs = require("fs");
 
+// Récupérer tous les livres
 exports.getAllBooks = (req, res, next) => {
       Book.find()
             .then((books) => res.status(200).json(books))
             .catch((error) => res.status(400).json({ error }));
 };
 
+// Créer un nouveau livre
 exports.createBook = (req, res, next) => {
       try {
             if (!req.body.book) {
                   throw new Error("Le corps de la requête ne contient pas de données JSON.");
             }
 
-            console.log("corps de la requete", req.body.book);
-
             const bookObject = JSON.parse(req.body.book);
             delete bookObject._id;
             delete bookObject._userId;
+
             const book = new Book({
                   ...bookObject,
                   userId: req.auth.userId,
@@ -36,6 +37,7 @@ exports.createBook = (req, res, next) => {
       }
 };
 
+// Modifier un livre
 exports.modifyBook = (req, res, next) => {
       const bookObject = req.file
             ? {
@@ -60,6 +62,7 @@ exports.modifyBook = (req, res, next) => {
             });
 };
 
+// Supprimer un livre
 exports.deleteBook = (req, res, next) => {
       Book.findOne({ _id: req.params.id })
             .then((book) => {
@@ -81,6 +84,7 @@ exports.deleteBook = (req, res, next) => {
             });
 };
 
+// Récupérer les livres avec la meilleure note
 exports.bestRating = (req, res, next) => {
       Book.find()
             .sort({ averageRating: -1 })
@@ -89,12 +93,14 @@ exports.bestRating = (req, res, next) => {
             .catch((error) => res.status(400).json({ error }));
 };
 
+// Récupérer un livre spécifique
 exports.getOneBook = (req, res, next) => {
       Book.findOne({ _id: req.params.id })
             .then((books) => res.status(200).json(books))
             .catch((error) => res.status(404).json({ error }));
 };
 
+// Ajouter une évaluation à un livre
 exports.addRating = (req, res, next) => {
       Book.findOne({ _id: req.params.id })
             .then((book) => {
@@ -107,12 +113,11 @@ exports.addRating = (req, res, next) => {
                         let currentRating = book.ratings[i].grade;
                         totalRating += currentRating;
                   }
+                  // toFixed(1) pour arrondir au 1/10
                   book.averageRating = (totalRating / book.ratings.length).toFixed(1);
-                  console.log(book.averageRating);
                   return book.save();
             })
             .then((book) => {
-                  console.log("Livre noté:", book);
                   res.status(201).json(book);
             })
             .catch((error) => {
