@@ -45,7 +45,24 @@ const imageOptimization = (req, res, next) => {
                         return next(err);
                   }
                   console.log("Image resized successfully");
-                  next();
+                  fs.unlink(filePath, (err) => {
+                        if (err) {
+                              console.error("Error deleting original image:", err);
+                        }
+
+                        // Renommer le fichier pour supprimer l'extension .webp
+                        const finalFilePath = outputFilePath.replace(".webp", "");
+                        fs.rename(outputFilePath, finalFilePath, (err) => {
+                              if (err) {
+                                    console.error("Error renaming file:", err);
+                                    return next(err);
+                              }
+
+                              console.log("File renamed successfully");
+                              req.file.path = finalFilePath;
+                              next();
+                        });
+                  });
             });
 };
 
